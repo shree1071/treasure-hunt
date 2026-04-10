@@ -30,7 +30,7 @@ export const LOCATION_CODES = {
   "9751": "welding",
   "4638": "bigscreen",
   "1295": "kuteera",
-  "7462": "bsn3rd",
+  "7642": "bsn3rd",
   "5820": "datacentre"
 };
 
