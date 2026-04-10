@@ -147,72 +147,19 @@ function ClueDisplay({ teamNumber, location, isStart, onLocationSubmit }) {
         return;
       }
 
-      // Check current actual progress from database to prevent skipping
-      const { data: prog } = await insforge.database
-        .from('team_progress')
-        .select('current_location, next_location')
-        .eq('team_id', teamNumber)
-        .maybeSingle();
+      // Check if this location is even in the team's route
+      const currentIndex = route.indexOf(location);
 
-      let curr = prog ? prog.current_location : null;
-      let expectedNext = prog ? prog.next_location : route[0];
-
-      if (prog) {
-        // If they were at the reunion, the true 'next physical location' is stop #5 (index 4)
-        if (expectedNext === 'reunion') {
-          expectedNext = route[4];
-        } 
-        // If Admin reset the team, they have null location and null next_location
-        else if (expectedNext === null && curr === null) {
-          expectedNext = route[0];
-        }
-      }
-
-      const isRefresh = (location === curr);
-      const isAdvance = (location === expectedNext);
-
-      // Validation 
-      if (!isRefresh && !isAdvance) {
-        let errorMsg = "";
-        
-        if (expectedNext === null && curr !== null) {
-          errorMsg = "Your journey is already complete! You don't need to scan anymore codes.";
-        } else if (route.indexOf(location) === -1) {
-          errorMsg = "This location is not in your route! Check your clue and go to the right location.";
-        } else {
-          errorMsg = "LOCATION ERROR: You entered a PIN out of order! Please check your previous clue and retry the correct location.";
-        }
-
-        const actualIndex = curr ? route.indexOf(curr) : -1;
-        const pct = actualIndex >= 0 ? Math.round(((actualIndex + 1) / route.length) * 100) : 0;
-        
-        if (curr === null) {
-          window.history.replaceState({}, '', window.location.pathname);
-        }
-
-        setProgress(pct);
+      if (currentIndex === -1) {
+        // Not in this team's route at all
+        setProgress(0);
+        setClue('This location is not part of your route! Re-read your clue and go to the right place.');
         setType('wrong');
-        
-        // As requested: Always display the hint for their actual expected location!
-        if (expectedNext) {
-          if (expectedNext === 'reunion') {
-             setClue(`${errorMsg}\n\n💡 YOUR HINT:\n${REUNION_MESSAGE}`);
-          } else {
-             const { data: hintData } = await insforge.database.from('th_locations').select('clue').eq('id', expectedNext).maybeSingle();
-             setClue(`${errorMsg}\n\n💡 YOUR CURRENT OBJECTIVE:\n"${hintData?.clue || 'Clue missing.'}"`);
-          }
-        } else {
-          setClue(errorMsg);
-        }
-        
         setLoading(false);
         return;
       }
 
-      // If valid, figure out which stop they're at
-      const currentIndex = route.indexOf(location);
-
-      // Base progress on currentIndex
+      // ── Valid location — proceed ─────────────────────────────────
       const pct = Math.round(((currentIndex + 1) / route.length) * 100);
       setProgress(pct);
 
@@ -231,13 +178,13 @@ function ClueDisplay({ teamNumber, location, isStart, onLocationSubmit }) {
         setType('final');
         await saveTeamProgress(teamNumber, location, null);
 
-        // Fetch rank by seeing how many teams have next_location = null
+        // Fetch rank
         const { data: finished } = await insforge.database
           .from('team_progress')
           .select('team_id')
           .is('next_location', null)
           .order('last_scanned_at', { ascending: true });
-        
+
         if (finished) {
           const r = finished.findIndex(t => t.team_id == teamNumber) + 1;
           setRank(r > 0 ? r : finished.length + 1);
