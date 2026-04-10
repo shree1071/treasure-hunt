@@ -147,17 +147,6 @@ function ClueDisplay({ teamNumber, location, isStart, onLocationSubmit }) {
         return;
       }
 
-      // Otherwise, figure out which stop they've arrived at
-      const currentIndex = route.indexOf(location);
-
-      if (currentIndex === -1) {
-        setProgress(0);
-        setClue("This location is not in your route! Check your clue and go to the right location.");
-        setType('wrong');
-        setLoading(false);
-        return;
-      }
-
       // Check current actual progress from database to prevent skipping
       const { data: prog } = await insforge.database
         .from('team_progress')
@@ -179,22 +168,49 @@ function ClueDisplay({ teamNumber, location, isStart, onLocationSubmit }) {
         }
       }
 
-      // If they scanned something that isn't their current location (refresh) AND isn't their expected next location
-      if (location !== curr && location !== expectedNext) {
+      const isRefresh = (location === curr);
+      const isAdvance = (location === expectedNext);
+
+      // Validation 
+      if (!isRefresh && !isAdvance) {
+        let errorMsg = "";
+        
+        if (expectedNext === null && curr !== null) {
+          errorMsg = "Your journey is already complete! You don't need to scan anymore codes.";
+        } else if (route.indexOf(location) === -1) {
+          errorMsg = "This location is not in your route! Check your clue and go to the right location.";
+        } else {
+          errorMsg = "LOCATION ERROR: You entered a PIN out of order! Please check your previous clue and retry the correct location.";
+        }
+
         const actualIndex = curr ? route.indexOf(curr) : -1;
         const pct = actualIndex >= 0 ? Math.round(((actualIndex + 1) / route.length) * 100) : 0;
         
-        // If they were entirely reset, clear their URL manually to prevent loops
         if (curr === null) {
           window.history.replaceState({}, '', window.location.pathname);
         }
 
         setProgress(pct);
-        setClue("LOCATION ERROR: You entered a PIN out of order! Please check your previous clue and retry the correct location.");
         setType('wrong');
+        
+        // As requested: Always display the hint for their actual expected location!
+        if (expectedNext) {
+          if (expectedNext === 'reunion') {
+             setClue(`${errorMsg}\n\n💡 YOUR HINT:\n${REUNION_MESSAGE}`);
+          } else {
+             const { data: hintData } = await insforge.database.from('th_locations').select('clue').eq('id', expectedNext).maybeSingle();
+             setClue(`${errorMsg}\n\n💡 YOUR CURRENT OBJECTIVE:\n"${hintData?.clue || 'Clue missing.'}"`);
+          }
+        } else {
+          setClue(errorMsg);
+        }
+        
         setLoading(false);
         return;
       }
+
+      // If valid, figure out which stop they're at
+      const currentIndex = route.indexOf(location);
 
       // Base progress on currentIndex
       const pct = Math.round(((currentIndex + 1) / route.length) * 100);
@@ -302,7 +318,7 @@ function ClueDisplay({ teamNumber, location, isStart, onLocationSubmit }) {
                 </div>
               </div>
             )}
-            <div className="clue-body">
+            <div className="clue-body" style={{ whiteSpace: 'pre-wrap' }}>
               <span className="quote-mark">"</span>
               {clue}
             </div>
@@ -318,7 +334,9 @@ function ClueDisplay({ teamNumber, location, isStart, onLocationSubmit }) {
             {!isStart && location && (
               <div className="meta-item">
                 <span className="meta-key">Node</span>
-                <span className="meta-val">{location.toUpperCase()}</span>
+                <span className="meta-val" style={type === 'wrong' ? { color: 'var(--accent)' } : {}}>
+                  {type === 'wrong' ? 'ACCESS DENIED' : location.toUpperCase()}
+                </span>
               </div>
             )}
             <div className="meta-item">
