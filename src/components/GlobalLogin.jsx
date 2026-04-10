@@ -194,39 +194,35 @@ function GlobalLogin({ onAuth }) {
 
       {/* Support Info */}
       <div style={{
-        marginTop: '2rem',
-        padding: '1.2rem',
+        marginTop: '1rem',
+        padding: '1rem',
         border: '1px solid rgba(255, 102, 0, 0.3)',
         borderRadius: '6px',
         backgroundColor: 'rgba(255, 102, 0, 0.05)',
-        textAlign: 'center',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
         fontFamily: 'var(--font-mono)'
       }}>
-        <div style={{ color: 'var(--accent)', fontSize: '0.75rem', letterSpacing: '0.1em', marginBottom: '0.5rem' }}>
-          // EMERGENCY OVERRIDE CONTACT
-        </div>
-        <div style={{ color: 'var(--text-bright)', fontSize: '0.9rem', marginBottom: '0.3rem' }}>
-          <strong>Shreeharsha</strong>
-        </div>
-        <div style={{ color: 'var(--text-dim)', fontSize: '0.8rem', marginBottom: '0.6rem' }}>
-          Technical Lead, Gen AI
+        <div style={{ textAlign: 'left' }}>
+          <div style={{ color: 'var(--accent)', fontSize: '0.6rem', letterSpacing: '0.1em', marginBottom: '0.2rem' }}>// SUPPORT</div>
+          <div style={{ color: 'var(--text-bright)', fontSize: '0.85rem', fontWeight: 'bold' }}>Shreeharsha</div>
+          <div style={{ color: 'var(--text-dim)', fontSize: '0.7rem' }}>Lead, Gen AI</div>
         </div>
         <a 
           href="tel:9901366449" 
           style={{ 
-            display: 'inline-block',
-            marginTop: '0.2rem',
-            padding: '0.4rem 1rem',
-            border: '1px solid var(--accent)',
+            padding: '0.5rem 0.8rem',
+            background: 'var(--accent)',
             borderRadius: '4px',
-            color: 'var(--accent)',
+            color: '#000',
             textDecoration: 'none',
-            fontSize: '0.9rem',
+            fontSize: '0.85rem',
             fontWeight: 'bold',
             letterSpacing: '0.05em'
           }}
         >
-          📞 9901 366 449
+          CALL
         </a>
       </div>
     </div>
