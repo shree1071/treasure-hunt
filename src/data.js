@@ -30,7 +30,7 @@ export const LOCATION_CODES = {
   "9751": "welding",
   "4638": "bigscreen",
   "1295": "kuteera",
-  "7642": "bsn3rd",
+  "7462": "bsn3rd",
   "5820": "datacentre"
 };
 
@@ -62,7 +62,7 @@ export const CLUES = {
   welding:      "You were looking for music, but creativity takes many forms. The room next door shapes metal, not melody. Look for sparks, not strings. Your code word is at the entrance.",
   bigscreen:    "I greet every student who walks through the gate. A giant display you cannot miss — I've seen every face that ever joined this college. Your code word is at the entrance.",
   kuteera:      "Sunlight through leaves, the smell of food in open air. Not a cafeteria, not a classroom — somewhere the campus exhales. Find the green corner where students go to breathe between battles. Your code word is on the notice board.",
-  bsn3rd:       "Climb up — three floors up in BSN. I am placed right outside a cabin. Come find what's waiting. Your code word is on the door.",
+  bsn3rd:       "Climb up — three floors up in BSN. I am placed right outside a cabin. Come find what's waiting. Your code word is on the notice board.",
   datacentre:   "The brain of the campus hums here. Racks of servers, blinking lights, cool air. Where all the data lives. Your code word is at the entrance.",
 };
 
