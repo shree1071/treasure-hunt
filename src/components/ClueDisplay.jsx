@@ -2,22 +2,35 @@ import { useEffect, useState } from 'react';
 import confetti from 'canvas-confetti';
 import { insforge, FINAL_CLUE, REUNION_MESSAGE } from '../insforge';
 import PhotoProof from './PhotoProof';
-import { LOCATION_CODES } from '../data';
+import { LOCATION_CODES, ROUTES, CLUES } from '../data';
 
 async function saveTeamProgress(teamId, currentLoc, nextLoc) {
   try {
+    const now = new Date().toISOString();
+    const { data: existing } = await insforge.database
+      .from('team_progress')
+      .select('team_id, started_at')
+      .eq('team_id', teamId)
+      .maybeSingle();
+
     const payload = {
       team_id: teamId,
       current_location: currentLoc,
       next_location: nextLoc || null,
-      last_scanned_at: new Date().toISOString(),
+      last_scanned_at: now,
+      finished_at: nextLoc === null ? now : null,
     };
-      const { data: existing } = await insforge.database.from('team_progress').select('team_id').eq('team_id', teamId).maybeSingle();
-      if (existing) {
-        await insforge.database.from('team_progress').update(payload).eq('team_id', teamId);
-      } else {
-        await insforge.database.from('team_progress').insert([{ team_id: teamId, ...payload }]);
-      }
+
+    if (existing) {
+      // Preserve original started_at
+      await insforge.database.from('team_progress').update(payload).eq('team_id', teamId);
+    } else {
+      // First scan — record start time
+      await insforge.database.from('team_progress').insert([{
+        ...payload,
+        started_at: now,
+      }]);
+    }
   } catch (err) {
     console.error('Progress save error:', err);
   }
@@ -111,36 +124,19 @@ function ClueDisplay({ teamNumber, location, isStart, onLocationSubmit }) {
       setLoading(true);
       setError('');
 
-      // Fetch team route
-      const { data: teamData, error: teamErr } = await insforge.database
-        .from('th_teams')
-        .select('route')
-        .eq('id', teamNumber)
-        .maybeSingle();
+      // Use local routes — no DB needed, always correct
+      const route = ROUTES[teamNumber];
 
-      if (teamErr || !teamData) {
-        setError('Could not load team data. Check your connection.');
+      if (!route) {
+        setError('Invalid team number. Please log in again.');
         setLoading(false);
         return;
       }
 
-      const route = teamData.route;
-
       // If start: show clue for route[0] (their first destination)
       if (isStart) {
         setProgress(0);
-        const { data: locData, error: locErr } = await insforge.database
-          .from('th_locations')
-          .select('clue')
-          .eq('id', route[0])
-          .maybeSingle();
-
-        if (locErr || !locData) {
-          setError('Could not load first clue. Try again.');
-          setLoading(false);
-          return;
-        }
-        setClue(locData.clue);
+        setClue(CLUES[route[0]] || 'Clue not found.');
         setType('normal');
         setLoading(false);
         saveTeamProgress(teamNumber, null, route[0]);
@@ -174,41 +170,15 @@ function ClueDisplay({ teamNumber, location, isStart, onLocationSubmit }) {
 
       // Last stop → Final
       if (currentIndex === route.length - 1) {
-        setClue(FINAL_CLUE);
         setType('final');
         await saveTeamProgress(teamNumber, location, null);
-
-        // Fetch rank
-        const { data: finished } = await insforge.database
-          .from('team_progress')
-          .select('team_id')
-          .is('next_location', null)
-          .order('last_scanned_at', { ascending: true });
-
-        if (finished) {
-          const r = finished.findIndex(t => t.team_id == teamNumber) + 1;
-          setRank(r > 0 ? r : finished.length + 1);
-        }
-
         setLoading(false);
         return;
       }
 
-      // Normal: fetch next location's clue
+      // Normal: use local clue — no DB needed
       const nextLocation = route[currentIndex + 1];
-      const { data: locData, error: locErr } = await insforge.database
-        .from('th_locations')
-        .select('clue')
-        .eq('id', nextLocation)
-        .maybeSingle();
-
-      if (locErr || !locData) {
-        setError('Could not load the next clue. Try again.');
-        setLoading(false);
-        return;
-      }
-
-      setClue(locData.clue);
+      setClue(CLUES[nextLocation] || 'Clue not found.');
       setType('normal');
       setLoading(false);
       saveTeamProgress(teamNumber, location, nextLocation);
@@ -230,7 +200,7 @@ function ClueDisplay({ teamNumber, location, isStart, onLocationSubmit }) {
   const headings = {
     normal: isStart ? 'FIRST OBJECTIVE' : 'NEXT OBJECTIVE',
     reunion: 'TEAM REUNION',
-    final: 'FINAL MISSION',
+    final: '🎉 HUNT COMPLETE!',
     wrong: 'WRONG LOCATION',
   };
 
@@ -255,20 +225,22 @@ function ClueDisplay({ teamNumber, location, isStart, onLocationSubmit }) {
           <div className="alert error">{error}</div>
         ) : (
           <>
-            {type === 'final' && rank && (
-              <div style={{ textAlign: 'center', marginBottom: '1.5rem', background: 'rgba(0, 230, 118, 0.05)', padding: '1rem', borderRadius: '6px', border: '1px solid rgba(0, 230, 118, 0.2)' }}>
-                <div style={{ fontSize: '1rem', color: 'var(--text-bright)', marginBottom: '0.5rem' }}>
-                  Congratulations on conquering <strong>{location.toUpperCase()}</strong>!
+            {type === 'final' ? (
+              <div style={{ textAlign: 'center', padding: '1rem 0' }}>
+                <div style={{ fontSize: '3rem', marginBottom: '0.5rem' }}>🎉</div>
+                <div style={{ fontSize: '1.1rem', color: 'var(--success)', fontFamily: 'var(--font-pixel)', marginBottom: '1rem', lineHeight: 1.5 }}>
+                  YOU COMPLETED THE HUNT!
                 </div>
-                <div style={{ fontSize: '2rem', color: 'var(--success)', fontFamily: 'var(--font-pixel)', textShadow: '0 0 15px rgba(0,230,118,0.5)' }}>
-                  {getRankName(rank)}
+                <div style={{ fontSize: '0.95rem', color: 'var(--text-dim)', lineHeight: 1.7, padding: '1rem', background: 'rgba(0,230,118,0.05)', borderRadius: '6px', border: '1px solid rgba(0,230,118,0.15)' }}>
+                  🏁 Head back to the <strong style={{ color: 'var(--text-bright)' }}>room where your journey started</strong> and fill in the <strong style={{ color: 'var(--accent)' }}>Google Form</strong> to officially register your finish!
                 </div>
               </div>
+            ) : (
+              <div className="clue-body" style={{ whiteSpace: 'pre-wrap' }}>
+                <span className="quote-mark">"</span>
+                {clue}
+              </div>
             )}
-            <div className="clue-body" style={{ whiteSpace: 'pre-wrap' }}>
-              <span className="quote-mark">"</span>
-              {clue}
-            </div>
           </>
         )}
 
