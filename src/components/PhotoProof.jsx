@@ -19,6 +19,8 @@ function PhotoProof({ teamNumber, location, onDone }) {
   const handleFile = (e) => {
     const f = e.target.files[0];
     if (!f) return;
+    // Revoke previous object URL to prevent memory leak
+    if (preview) URL.revokeObjectURL(preview);
     setFile(f);
     setPreview(URL.createObjectURL(f));
     setError('');

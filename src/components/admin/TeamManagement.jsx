@@ -2,12 +2,12 @@ import { useState } from 'react';
 
 const LOCATIONS = [
   'room506','amphitheatre','library','foodcourt',
-  'welding','bigscreen','kuteera','bsn4th','datacentre'
+  'welding','bigscreen','kuteera','bsn3rd','datacentre'
 ];
 const LOCATION_LABELS = {
   room506:'Room 506', amphitheatre:'Amphitheatre', library:'Library',
   foodcourt:'Food Court', welding:'Welding Lab', bigscreen:'Big Screen',
-  kuteera:'Kuteera', bsn4th:'BSN 4th Floor', datacentre:'Data Centre',
+  kuteera:'Kuteera', bsn3rd:'BSN 3rd Floor', datacentre:'Data Centre',
 };
 
 export default function TeamManagement({ gameState }) {

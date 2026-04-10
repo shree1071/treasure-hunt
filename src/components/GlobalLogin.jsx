@@ -171,10 +171,12 @@ function GlobalLogin({ onAuth }) {
             <input
               id="teamPin"
               type="password"
+              inputMode="numeric"
+              pattern="[0-9]*"
               maxLength={4}
               placeholder="4-digit PIN"
               value={pin}
-              onChange={e => setPin(e.target.value)}
+              onChange={e => setPin(e.target.value.replace(/\D/g, '').slice(0, 4))}
               required
             />
           </div>

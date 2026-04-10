@@ -4,7 +4,7 @@ const CLUE_KEYS = [
   { key: 'room506', label: 'Room 506' }, { key: 'amphitheatre', label: 'Amphitheatre' },
   { key: 'library', label: 'Library' }, { key: 'foodcourt', label: 'Food Court' },
   { key: 'welding', label: 'Welding Lab' }, { key: 'bigscreen', label: 'Big Screen' },
-  { key: 'kuteera', label: 'Kuteera' }, { key: 'bsn4th', label: 'BSN 4th Floor' },
+  { key: 'kuteera', label: 'Kuteera' }, { key: 'bsn3rd', label: 'BSN 3rd Floor' },
   { key: 'datacentre', label: 'Data Centre' },
 ];
 
