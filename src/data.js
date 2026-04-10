@@ -23,15 +23,15 @@ export const LOCATIONS = [
 
 // Mapping of numeric PINs from QRs to standard location IDs
 export const LOCATION_CODES = {
-  "1506": "room506",
-  "2202": "amphitheatre",
-  "3303": "library",
-  "4404": "foodcourt",
-  "5505": "welding",
-  "6606": "bigscreen",
-  "7707": "kuteera",
-  "8808": "bsn3rd",
-  "9909": "datacentre"
+  "8143": "room506",
+  "3927": "amphitheatre",
+  "6519": "library",
+  "2084": "foodcourt",
+  "9751": "welding",
+  "4638": "bigscreen",
+  "1295": "kuteera",
+  "7462": "bsn3rd",
+  "5820": "datacentre"
 };
 
 // Each team's ordered route (9 stops)

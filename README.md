@@ -36,15 +36,15 @@ You must place 9 physical QR codes around the campus at the designated locations
 - **Type of QR Code**: Plain Text (TXT)
 - **Content**: A 4-digit number.
 - **Node List**:
-  - `1506` -> Room 506
-  - `2202` -> Amphitheatre
-  - `3303` -> Library
-  - `4404` -> Food Court
-  - `5505` -> Welding
-  - `6606` -> Big Screen
-  - `7707` -> Kuteera
-  - `8808` -> BSN 3rd Floor (Cabin)
-  - `9909` -> Datacentre
+  - `8143` -> Room 506
+  - `3927` -> Amphitheatre
+  - `6519` -> Library
+  - `2084` -> Food Court
+  - `9751` -> Welding
+  - `4638` -> Big Screen
+  - `1295` -> Kuteera
+  - `7462` -> BSN 3rd Floor (Cabin)
+  - `5820` -> Datacentre
 
 ### For the Players
 1. **Split up**: 3 runners hunt locations, 1 stays at Base.

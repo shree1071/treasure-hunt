@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import confetti from 'canvas-confetti';
 import { insforge, FINAL_CLUE, REUNION_MESSAGE } from '../insforge';
 import PhotoProof from './PhotoProof';
 import { LOCATION_CODES } from '../data';
@@ -59,7 +60,7 @@ function LocationEntryInline({ onLocationSubmit }) {
       <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
         <input
           type="number"
-          placeholder="e.g. 3303"
+          placeholder="e.g. 1234"
           value={code}
           onChange={e => setCode(e.target.value)}
           required
@@ -90,6 +91,20 @@ function ClueDisplay({ teamNumber, location, isStart, onLocationSubmit }) {
   const [type, setType] = useState('normal'); // 'normal' | 'reunion' | 'final' | 'wrong'
   const [proofDone, setProofDone] = useState(isStart); // no proof needed at start
   const [progress, setProgress] = useState(0);
+  const [rank, setRank] = useState(null);
+
+  const getRankName = (r) => {
+    if (r === 1) return '1ST PLACE 🥇';
+    if (r === 2) return '2ND PLACE 🥈';
+    if (r === 3) return '3RD PLACE 🥉';
+    return `${r}TH PLACE`;
+  };
+
+  useEffect(() => {
+    if (type === 'final') {
+      confetti({ particleCount: 150, spread: 100, origin: { y: 0.6 } });
+    }
+  }, [type]);
 
   useEffect(() => {
     async function fetchClue() {
@@ -137,7 +152,45 @@ function ClueDisplay({ teamNumber, location, isStart, onLocationSubmit }) {
 
       if (currentIndex === -1) {
         setProgress(0);
-        setClue("This isn't your next stop! Check your clue and go to the right location.");
+        setClue("This location is not in your route! Check your clue and go to the right location.");
+        setType('wrong');
+        setLoading(false);
+        return;
+      }
+
+      // Check current actual progress from database to prevent skipping
+      const { data: prog } = await insforge.database
+        .from('team_progress')
+        .select('current_location, next_location')
+        .eq('team_id', teamNumber)
+        .maybeSingle();
+
+      let curr = prog ? prog.current_location : null;
+      let expectedNext = prog ? prog.next_location : route[0];
+
+      if (prog) {
+        // If they were at the reunion, the true 'next physical location' is stop #5 (index 4)
+        if (expectedNext === 'reunion') {
+          expectedNext = route[4];
+        } 
+        // If Admin reset the team, they have null location and null next_location
+        else if (expectedNext === null && curr === null) {
+          expectedNext = route[0];
+        }
+      }
+
+      // If they scanned something that isn't their current location (refresh) AND isn't their expected next location
+      if (location !== curr && location !== expectedNext) {
+        const actualIndex = curr ? route.indexOf(curr) : -1;
+        const pct = actualIndex >= 0 ? Math.round(((actualIndex + 1) / route.length) * 100) : 0;
+        
+        // If they were entirely reset, clear their URL manually to prevent loops
+        if (curr === null) {
+          window.history.replaceState({}, '', window.location.pathname);
+        }
+
+        setProgress(pct);
+        setClue("LOCATION ERROR: You entered a PIN out of order! Please check your previous clue and retry the correct location.");
         setType('wrong');
         setLoading(false);
         return;
@@ -160,8 +213,21 @@ function ClueDisplay({ teamNumber, location, isStart, onLocationSubmit }) {
       if (currentIndex === route.length - 1) {
         setClue(FINAL_CLUE);
         setType('final');
+        await saveTeamProgress(teamNumber, location, null);
+
+        // Fetch rank by seeing how many teams have next_location = null
+        const { data: finished } = await insforge.database
+          .from('team_progress')
+          .select('team_id')
+          .is('next_location', null)
+          .order('last_scanned_at', { ascending: true });
+        
+        if (finished) {
+          const r = finished.findIndex(t => t.team_id == teamNumber) + 1;
+          setRank(r > 0 ? r : finished.length + 1);
+        }
+
         setLoading(false);
-        saveTeamProgress(teamNumber, location, null);
         return;
       }
 
@@ -225,10 +291,22 @@ function ClueDisplay({ teamNumber, location, isStart, onLocationSubmit }) {
         {error ? (
           <div className="alert error">{error}</div>
         ) : (
-          <div className="clue-body">
-            <span className="quote-mark">"</span>
-            {clue}
-          </div>
+          <>
+            {type === 'final' && rank && (
+              <div style={{ textAlign: 'center', marginBottom: '1.5rem', background: 'rgba(0, 230, 118, 0.05)', padding: '1rem', borderRadius: '6px', border: '1px solid rgba(0, 230, 118, 0.2)' }}>
+                <div style={{ fontSize: '1rem', color: 'var(--text-bright)', marginBottom: '0.5rem' }}>
+                  Congratulations on conquering <strong>{location.toUpperCase()}</strong>!
+                </div>
+                <div style={{ fontSize: '2rem', color: 'var(--success)', fontFamily: 'var(--font-pixel)', textShadow: '0 0 15px rgba(0,230,118,0.5)' }}>
+                  {getRankName(rank)}
+                </div>
+              </div>
+            )}
+            <div className="clue-body">
+              <span className="quote-mark">"</span>
+              {clue}
+            </div>
+          </>
         )}
 
         {!error && (
