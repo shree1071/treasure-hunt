@@ -1,0 +1,37 @@
+@import url('https://fonts.googleapis.com/css2?family=DotGothic16&family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600&display=swap');
+
+:root {
+  --bg: #050505;
+  --panel: #0d0d0f;
+  --border: rgba(255,255,255,0.08);
+  --border-bright: rgba(255,255,255,0.18);
+  --accent: #ff5500;
+  --accent-glow: rgba(255, 85, 0, 0.45);
+  --text: #c8c8cc;
+  --text-bright: #f0f0f3;
+  --text-dim: #555562;
+  --font-pixel: 'DotGothic16', monospace;
+  --font-mono: 'Space Mono', monospace;
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --error: #ff3344;
+  --success: #00e676;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background-color: var(--bg);
+  /* Dot-grid background */
+  background-image: radial-gradient(circle, rgba(255,255,255,0.06) 1px, transparent 1px);
+  background-size: 28px 28px;
+  color: var(--text);
+  font-family: var(--font-sans);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
