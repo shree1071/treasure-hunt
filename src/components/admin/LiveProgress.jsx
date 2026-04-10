@@ -4,7 +4,7 @@ import { insforge } from '../../insforge';
 const LOCATION_LABELS = {
   room506: 'Room 506', amphitheatre: 'Amphitheatre', library: 'Library',
   foodcourt: 'Food Court', welding: 'Welding Lab', bigscreen: 'Big Screen',
-  kuteera: 'Kuteera', bsn4th: 'BSN 4th Floor', datacentre: 'Data Centre',
+  kuteera: 'Kuteera', bsn3rd: 'BSN 3rd Floor', datacentre: 'Data Centre',
 };
 
 function timeSince(dateStr) {
@@ -45,16 +45,28 @@ export default function LiveProgress({ gameState }) {
   const allTeams = (teams.length ? teams : Array.from({ length: 15 }, (_, i) => ({ id: i + 1, route: [] }))).map(team => {
     const prog = progress.find(p => String(p.team_id) === String(team.id));
     const route = team.route || [];
-    const idx = prog?.current_location ? route.indexOf(prog.current_location) : -1;
     const total = route.length || 9;
+
+    // Only use current_location for indexOf if it's a real stop in their route.
+    // Guard against stale "reunion" strings or nulls from old data.
+    const currentLoc = prog?.current_location;
+    const idx = (currentLoc && route.includes(currentLoc)) ? route.indexOf(currentLoc) : -1;
+
+    // Next location shown to admin — filter out any legacy non-stop strings
+    const nextLoc = prog?.next_location;
+    const safeNextLoc = (nextLoc && route.includes(nextLoc)) ? nextLoc : null;
+
     return {
       id: team.id,
-      currentLocation: prog?.current_location,
-      nextLocation: prog?.next_location,
+      currentLocation: currentLoc,
+      nextLocation: safeNextLoc,
       lastScanned: prog?.last_scanned_at,
       stopIndex: idx,
       totalStops: total,
+      // If they have a progress row but current_location is null → they've logged in but not scanned yet → 0%
+      // If idx >= 0 → they've completed that stop → (idx+1)/total
       percentage: idx < 0 ? 0 : Math.round(((idx + 1) / total) * 100),
+      hasStarted: !!prog,
     };
   });
 

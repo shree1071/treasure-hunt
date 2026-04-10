@@ -134,12 +134,16 @@ function ClueDisplay({ teamNumber, location, isStart, onLocationSubmit }) {
       }
 
       // If start: show clue for route[0] (their first destination)
+      // Save progress so admin sees them as "In Progress" immediately.
       if (isStart) {
+        const firstStop = route[0];
+        // Progress shows 0 stops done, heading to stop 1
         setProgress(0);
-        setClue(CLUES[route[0]] || 'Clue not found.');
+        setClue(CLUES[firstStop] || 'Clue not found.');
         setType('normal');
         setLoading(false);
-        saveTeamProgress(teamNumber, null, route[0]);
+        // current_location = null means "not at a stop yet"; next = their first real stop.
+        saveTeamProgress(teamNumber, null, firstStop);
         return;
       }
 
@@ -147,24 +151,31 @@ function ClueDisplay({ teamNumber, location, isStart, onLocationSubmit }) {
       const currentIndex = route.indexOf(location);
 
       if (currentIndex === -1) {
-        // Not in this team's route at all
+        // Not in this team's route at all — wrong place
         setProgress(0);
         setClue('This location is not part of your route! Re-read your clue and go to the right place.');
         setType('wrong');
         setLoading(false);
+        // Don't overwrite DB progress on a wrong scan
         return;
       }
 
-      // ── Valid location — proceed ─────────────────────────────────
-      const pct = Math.round(((currentIndex + 1) / route.length) * 100);
+      // ── Valid location — compute stable progress ──────────────────
+      // (currentIndex + 1) out of route.length stops completed.
+      // We do NOT use reunion/final as location IDs in the DB — only real stop IDs.
+      const stopsCompleted = currentIndex + 1;
+      const pct = Math.round((stopsCompleted / route.length) * 100);
       setProgress(pct);
 
-      // After 4th stop (index 3) → Reunion
+      // After 4th stop (index 3) → Reunion twist
+      // IMPORTANT: next_location must be a real stop ID (route[4] = datacentre),
+      // NOT the string "reunion" — that would break indexOf() on the admin side.
       if (currentIndex === 3) {
+        const fifthStop = route[4]; // always 'datacentre'
         setClue(REUNION_MESSAGE);
         setType('reunion');
         setLoading(false);
-        saveTeamProgress(teamNumber, location, 'reunion');
+        saveTeamProgress(teamNumber, location, fifthStop);
         return;
       }
 
@@ -176,7 +187,7 @@ function ClueDisplay({ teamNumber, location, isStart, onLocationSubmit }) {
         return;
       }
 
-      // Normal: use local clue — no DB needed
+      // Normal stop: show clue for NEXT location
       const nextLocation = route[currentIndex + 1];
       setClue(CLUES[nextLocation] || 'Clue not found.');
       setType('normal');
