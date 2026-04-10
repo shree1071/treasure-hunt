@@ -18,7 +18,7 @@ export const TEAMS = {
 
 export const LOCATIONS = [
   "room506", "amphitheatre", "library", "foodcourt", 
-  "welding", "bigscreen", "kuteera", "bsn4th", "datacentre", "start"
+  "welding", "bigscreen", "kuteera", "bsn3rd", "datacentre", "start"
 ];
 
 // Mapping of numeric PINs from QRs to standard location IDs
@@ -30,27 +30,27 @@ export const LOCATION_CODES = {
   "5505": "welding",
   "6606": "bigscreen",
   "7707": "kuteera",
-  "8808": "bsn4th",
+  "8808": "bsn3rd",
   "9909": "datacentre"
 };
 
 // Each team's ordered route (9 stops)
 export const ROUTES = {
-  1:  ["room506", "amphitheatre", "library", "foodcourt", "datacentre", "bsn4th", "welding", "bigscreen", "kuteera"],
-  2:  ["welding", "room506", "kuteera", "bsn4th", "datacentre", "amphitheatre", "library", "bigscreen", "foodcourt"],
-  3:  ["amphitheatre", "welding", "kuteera", "bsn4th", "datacentre", "library", "foodcourt", "bigscreen", "room506"],
-  4:  ["bigscreen", "room506", "amphitheatre", "library", "datacentre", "welding", "foodcourt", "kuteera", "bsn4th"],
-  5:  ["kuteera", "welding", "library", "foodcourt", "datacentre", "bsn4th", "room506", "amphitheatre", "bigscreen"],
-  6:  ["kuteera", "room506", "welding", "amphitheatre", "datacentre", "bigscreen", "foodcourt", "library", "bsn4th"],
-  7:  ["bsn4th", "bigscreen", "welding", "foodcourt", "datacentre", "amphitheatre", "kuteera", "library", "room506"],
-  8:  ["bigscreen", "room506", "bsn4th", "kuteera", "datacentre", "library", "amphitheatre", "welding", "foodcourt"],
-  9:  ["room506", "amphitheatre", "library", "welding", "datacentre", "foodcourt", "bigscreen", "bsn4th", "kuteera"],
-  10: ["bigscreen", "welding", "library", "bsn4th", "datacentre", "kuteera", "amphitheatre", "room506", "foodcourt"],
-  11: ["amphitheatre", "bsn4th", "kuteera", "welding", "datacentre", "library", "bigscreen", "foodcourt", "room506"],
-  12: ["bigscreen", "welding", "foodcourt", "kuteera", "datacentre", "amphitheatre", "library", "room506", "bsn4th"],
-  13: ["welding", "amphitheatre", "library", "kuteera", "datacentre", "foodcourt", "room506", "bsn4th", "bigscreen"],
-  14: ["bigscreen", "kuteera", "amphitheatre", "library", "datacentre", "room506", "foodcourt", "welding", "bsn4th"],
-  15: ["amphitheatre", "bigscreen", "welding", "bsn4th", "datacentre", "kuteera", "foodcourt", "library", "room506"],
+  1:  ["room506", "amphitheatre", "library", "foodcourt", "datacentre", "bsn3rd", "welding", "bigscreen", "kuteera"],
+  2:  ["welding", "room506", "kuteera", "bsn3rd", "datacentre", "amphitheatre", "library", "bigscreen", "foodcourt"],
+  3:  ["amphitheatre", "welding", "kuteera", "bsn3rd", "datacentre", "library", "foodcourt", "bigscreen", "room506"],
+  4:  ["bigscreen", "room506", "amphitheatre", "library", "datacentre", "welding", "foodcourt", "kuteera", "bsn3rd"],
+  5:  ["kuteera", "welding", "library", "foodcourt", "datacentre", "bsn3rd", "room506", "amphitheatre", "bigscreen"],
+  6:  ["kuteera", "room506", "welding", "amphitheatre", "datacentre", "bigscreen", "foodcourt", "library", "bsn3rd"],
+  7:  ["bsn3rd", "bigscreen", "welding", "foodcourt", "datacentre", "amphitheatre", "kuteera", "library", "room506"],
+  8:  ["bigscreen", "room506", "bsn3rd", "kuteera", "datacentre", "library", "amphitheatre", "welding", "foodcourt"],
+  9:  ["room506", "amphitheatre", "library", "welding", "datacentre", "foodcourt", "bigscreen", "bsn3rd", "kuteera"],
+  10: ["bigscreen", "welding", "library", "bsn3rd", "datacentre", "kuteera", "amphitheatre", "room506", "foodcourt"],
+  11: ["amphitheatre", "bsn3rd", "kuteera", "welding", "datacentre", "library", "bigscreen", "foodcourt", "room506"],
+  12: ["bigscreen", "welding", "foodcourt", "kuteera", "datacentre", "amphitheatre", "library", "room506", "bsn3rd"],
+  13: ["welding", "amphitheatre", "library", "kuteera", "datacentre", "foodcourt", "room506", "bsn3rd", "bigscreen"],
+  14: ["bigscreen", "kuteera", "amphitheatre", "library", "datacentre", "room506", "foodcourt", "welding", "bsn3rd"],
+  15: ["amphitheatre", "bigscreen", "welding", "bsn3rd", "datacentre", "kuteera", "foodcourt", "library", "room506"],
 };
 
 // Clue text for each location
@@ -62,7 +62,7 @@ export const CLUES = {
   welding:      "You were looking for music, but creativity takes many forms. The room next door shapes metal, not melody. Look for sparks, not strings. Your code word is at the entrance.",
   bigscreen:    "I greet every student who walks through the gate. A giant display you cannot miss — I've seen every face that ever joined this college. Your code word is at the entrance.",
   kuteera:      "Sunlight through leaves, the smell of food in open air. Not a cafeteria, not a classroom — somewhere the campus exhales. Find the green corner where students go to breathe between battles. Your code word is on the notice board.",
-  bsn4th:       "Climb high — four floors up in BSN. A board on the wall knows every event before you do. Come find what's been announced. Your code word is on the event board.",
+  bsn3rd:       "Climb up — three floors up in BSN. I am placed right outside a cabin. Come find what's waiting. Your code word is on the door.",
   datacentre:   "The brain of the campus hums here. Racks of servers, blinking lights, cool air. Where all the data lives. Your code word is at the entrance.",
 };
 

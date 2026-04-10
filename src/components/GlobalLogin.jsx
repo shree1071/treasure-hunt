@@ -184,6 +184,30 @@ function GlobalLogin({ onAuth }) {
         </form>
       </div>
 
+      {/* Side Quest Bounty */}
+      <div style={{
+        marginTop: '1.5rem',
+        marginBottom: '1.5rem',
+        padding: '1.2rem',
+        border: '1px dashed var(--accent)',
+        borderRadius: '6px',
+        background: 'repeating-linear-gradient(45deg, rgba(255, 85, 0, 0.03), rgba(255, 85, 0, 0.03) 10px, transparent 10px, transparent 20px)',
+        boxShadow: '0 0 15px rgba(255, 85, 0, 0.1)',
+        fontFamily: 'var(--font-mono)'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', marginBottom: '0.6rem' }}>
+          <span style={{ fontSize: '1.4rem', animation: 'core-glow 2s infinite' }}>💎</span>
+          <div style={{ color: 'var(--accent)', fontSize: '0.85rem', fontWeight: 'bold', letterSpacing: '0.15em' }}>
+            // HIDDEN BOUNTY
+          </div>
+        </div>
+        <div style={{ color: 'var(--text-bright)', fontSize: '0.85rem', lineHeight: '1.6' }}>
+          If you find <strong>Vidya's ID card</strong> (lost 2 days ago) during your hunt, return it to claim a special 
+          <span style={{ color: 'var(--accent)', fontWeight: 'bold' }}> Bonus Prize </span> 
+          directly from Vidya!
+        </div>
+      </div>
+
       {/* Rules */}
       <div className="rules-card">
         <div className="rules-title">// Mission Rules</div>

@@ -43,7 +43,7 @@ You must place 9 physical QR codes around the campus at the designated locations
   - `5505` -> Welding
   - `6606` -> Big Screen
   - `7707` -> Kuteera
-  - `8808` -> BSN 4th Floor
+  - `8808` -> BSN 3rd Floor (Cabin)
   - `9909` -> Datacentre
 
 ### For the Players
