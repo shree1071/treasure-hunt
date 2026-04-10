@@ -47,6 +47,8 @@ function GameApp() {
     return null;
   });
 
+  const [scanKey, setScanKey] = useState(0);
+
   const [restoring, setRestoring] = useState(() => {
     const saved = sessionStorage.getItem('th_team');
     const params = new URLSearchParams(window.location.search);
@@ -96,6 +98,7 @@ function GameApp() {
     url.searchParams.set('location', locCode);
     window.history.pushState({}, '', url);
     setLocation(locCode);
+    setScanKey(k => k + 1); // force ClueDisplay to remount even if location unchanged
   };
 
   // ── Render flow ───────────────────────────────────────────────────
@@ -117,6 +120,7 @@ function GameApp() {
     // The Location form is inside ClueDisplay!
     return (
       <ClueDisplay 
+        key={scanKey}
         teamNumber={teamNumber} 
         location={location} 
         isStart={!location} 
