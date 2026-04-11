@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { insforge } from '../../insforge';
 
 const LOCATION_LABELS = {
@@ -23,9 +23,10 @@ export default function LiveProgress({ gameState }) {
   const [overrideLocation, setOverrideLocation] = useState('');
   const [saving, setSaving] = useState(false);
   const [successMsg, setSuccessMsg] = useState('');
+  const [wsStatus, setWsStatus] = useState('connecting'); // 'connecting' | 'connected' | 'disconnected'
+  const handlerRef = useRef(null);
 
   const fetchProgress = async () => {
-    setLoadingProgress(true);
     const { data, error } = await insforge.database
       .from('team_progress')
       .select('*')
@@ -36,9 +37,63 @@ export default function LiveProgress({ gameState }) {
   };
 
   useEffect(() => {
+    // Initial data load
     fetchProgress();
+
+    // Set up real-time WebSocket subscription
+    let mounted = true;
+    const setupRealtime = async () => {
+      try {
+        await insforge.realtime.connect();
+        if (!mounted) return;
+
+        const subResult = await insforge.realtime.subscribe('team_progress:all');
+        if (!subResult || !subResult.ok) {
+           console.error('Failed to subscribe:', subResult?.error);
+           if (mounted) setWsStatus('disconnected');
+           return;
+        }
+        if (!mounted) return;
+
+        setWsStatus('connected');
+        console.log('Realtime connected and subscribed to team_progress:all');
+
+        // Listen for progress updates directly
+        const handleUpdate = (payload) => {
+          console.log('Received realtime progress update:', payload);
+          fetchProgress();
+        };
+        insforge.realtime.on('progress_updated', handleUpdate);
+
+        // Store reference cleanup to be used in unmount
+        handlerRef.current = handleUpdate;
+
+        insforge.realtime.on('disconnect', () => {
+          if (mounted) setWsStatus('disconnected');
+        });
+        insforge.realtime.on('connect', () => {
+          if (mounted) setWsStatus('connected');
+        });
+      } catch (err) {
+        console.error('Realtime setup error:', err);
+        if (mounted) setWsStatus('disconnected');
+      }
+    };
+
+    setupRealtime();
+
+    // Fallback polling to guarantee updates even if WS is blocked/failing
     const interval = setInterval(fetchProgress, 3000);
-    return () => clearInterval(interval);
+
+    return () => {
+      mounted = false;
+      clearInterval(interval);
+      if (handlerRef.current) {
+        insforge.realtime.off('progress_updated', handlerRef.current);
+      }
+      insforge.realtime.unsubscribe('team_progress:all');
+      // DO NOT disconnect globally so other components relying on realtime don't fail
+    };
   }, []);
 
   // Build full status for all 15 teams
@@ -130,6 +185,25 @@ export default function LiveProgress({ gameState }) {
 
   return (
     <div className="admin-section">
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+        <h3 style={{ margin: 0 }}>Live Progress</h3>
+        <div style={{ 
+          fontSize: '0.85rem', 
+          display: 'flex', 
+          alignItems: 'center', 
+          gap: '0.5rem',
+          color: wsStatus === 'connected' ? '#10b981' : wsStatus === 'connecting' ? '#f59e0b' : '#ef4444'
+        }}>
+          <div style={{ 
+            width: '8px', 
+            height: '8px', 
+            borderRadius: '50%', 
+            backgroundColor: wsStatus === 'connected' ? '#10b981' : wsStatus === 'connecting' ? '#f59e0b' : '#ef4444' 
+          }}></div>
+          {wsStatus === 'connected' ? 'Live (WebSocket)' : wsStatus === 'connecting' ? 'Connecting...' : 'Disconnected'}
+        </div>
+      </div>
+      
       {/* Stats Row */}
       <div className="admin-stats-row">
         <div className="admin-stat-card stat-blue">

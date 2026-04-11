@@ -59,10 +59,10 @@ export const CLUES = {
   amphitheatre: "Open skies above, tiered seats below. I am the stage where ideas perform and voices carry far. Find me where the academic block breathes. Your code word is at the entrance.",
   library:      "Thousands of voices, yet perfectly silent. Rows of knowledge line my walls. Scholars come to me when Google isn't enough. Your code word is at the entrance.",
   foodcourt:    "Follow your nose to the lab block. Where hungry minds refuel between builds and bugs. I smell better than your deadline. Your code word is at the entrance.",
-  welding:      "You were looking for music, but creativity takes many forms. The room next door shapes metal, not melody. Look for sparks, not strings. Your code word is at the entrance.",
+  welding:      "You were looking for music, but creativity takes many forms. The room next door shapes metal, not melody. Look for sparks, not strings. Find it behind the mechanical academic block. Your code word is at the entrance.",
   bigscreen:    "I greet every student who walks through the gate. A giant display you cannot miss — I've seen every face that ever joined this college. Your code word is at the entrance.",
   kuteera:      "Sunlight through leaves, the smell of food in open air. Not a cafeteria, not a classroom — somewhere the campus exhales. Find the green corner where students go to breathe between battles. Your code word is on the notice board.",
-  bsn3rd:       "Climb up — three floors up in BSN. I am placed right outside a cabin. Come find what's waiting. Your code word is on the notice board.",
+  bsn3rd:       "Climb up — three floors up in BSN. I am placed right in front of Sonne Gowda cabin. Come find what's waiting. Your code word is on the wall.",
   datacentre:   "The brain of the campus hums here. Racks of servers, blinking lights, cool air. Where all the data lives. Your code word is at the entrance.",
 };
 
